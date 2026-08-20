@@ -23,3 +23,30 @@ document.addEventListener('DOMContentLoaded',()=>{
  if($('#annCalc'))$('#annCalc').onsubmit=e=>{e.preventDefault();let raw=$('#annDate').value,s=dateOnly(raw),today=dateOnly(todayISO());if(!s)return validationResult($('#annResult'),'Please choose your relationship anniversary date.');if(s>today)return validationResult($('#annResult'),'The anniversary date cannot be in the future.');let next=new Date(today.getFullYear(),s.getMonth(),s.getDate()),todayTime=today.getTime();if(next.getTime()<todayTime)next.setFullYear(next.getFullYear()+1);let d=Math.round((next-today)/86400000),t=daysBetween(raw,todayISO());showResult($('#annResult'),`<h2>Your Next Anniversary</h2><div class="score">${d}</div><p>days to go</p><p>You've been together for approximately <b>${t.toLocaleString()} days</b>.</p>`)};
  if($('#msgGen'))$('#msgGen').onsubmit=e=>{e.preventDefault();let who=$('#msgWho').value,mood=$('#msgMood').value,name=$('#msgName').value.trim();const address=name?` ${esc(name)}`:'';let templates={Romantic:`My love${address}, every moment with you feels like a little piece of magic. I’m grateful for you today and every day. ❤️`,Cute:`${name?`Hey ${esc(name)}, `:''}just a little reminder that you make my days brighter and my heart happier. Thinking of you! 💕`,Flirty:`${name?`${esc(name)}, `:''}I was trying to focus today, but then you crossed my mind again. Clearly, you’re becoming my favorite distraction. 😉`,Sweet:`${name?`${esc(name)}, `:''}I hope you know how special you are to me. Thank you for being someone I can smile about every day. 💗`,Anniversary:`Happy anniversary${address}! I’m so grateful for every memory we’ve created and excited for all the moments still ahead. ❤️`};const text=templates[mood];showResult($('#msgResult'),`<h2>Your ${esc(mood)} Message</h2><p class="quote">${text}</p><button class="btn" type="button" id="copyMessage">Copy Message</button><p id="copyStatus" class="notice" hidden>Message copied! 💕</p>`);const copy=$('#copyMessage');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText($('#msgResult .quote').innerText);$('#copyStatus').hidden=false}catch{const ta=document.createElement('textarea');ta.value=$('#msgResult .quote').innerText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();$('#copyStatus').hidden=false}}};
 });
+
+/* Lightweight decorative heart rain: CSS handles animation, JS only creates a few nodes. */
+document.addEventListener('DOMContentLoaded',()=>{
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const layer=document.createElement('div');
+  layer.className='heart-rain';
+  layer.setAttribute('aria-hidden','true');
+  document.body.appendChild(layer);
+  const mobile=window.matchMedia('(max-width:600px)').matches;
+  const count=mobile?5:8;
+  const spawn=()=>{
+    const heart=document.createElement('span');
+    heart.className='floating-heart';
+    heart.textContent=Math.random()>.28?'♥':'❤';
+    heart.style.left=`${Math.random()*100}%`;
+    heart.style.setProperty('--drift',`${(Math.random()*90-45).toFixed(0)}px`);
+    heart.style.setProperty('--spin',`${(Math.random()*80-40).toFixed(0)}deg`);
+    heart.style.animationDuration=`${(7+Math.random()*5).toFixed(1)}s`;
+    heart.style.animationDelay=`${(Math.random()*1.5).toFixed(2)}s`;
+    heart.style.fontSize=`${(12+Math.random()*7).toFixed(0)}px`;
+    layer.appendChild(heart);
+    heart.addEventListener('animationend',()=>heart.remove(),{once:true});
+  };
+  for(let i=0;i<count;i++)spawn();
+  const timer=setInterval(spawn,2600);
+  window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
+});
