@@ -1,6 +1,24 @@
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function showResult(el,html){el.innerHTML=html;el.classList.add('show');el.scrollIntoView({behavior:'smooth',block:'nearest'})}
+
+/* Site-wide theme preference: saved locally and restored on every page. */
+(function(){
+  const saved=localStorage.getItem('lovetools-theme');
+  if(saved==='dark')document.documentElement.classList.add('dark-mode');
+})();
+
+function setupThemeToggle(){
+  const nav=$('.nav'),links=$('.navlinks');
+  if(!nav||!links||$('.theme-toggle'))return;
+  const item=document.createElement('button');
+  item.type='button'; item.className='theme-toggle'; item.setAttribute('aria-label','Switch to dark mode'); item.setAttribute('aria-pressed',String(document.documentElement.classList.contains('dark-mode')));
+  const update=()=>{const dark=document.documentElement.classList.contains('dark-mode');item.innerHTML=dark?'☀️ <span>Light</span>':'🌙 <span>Dark</span>';item.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');item.setAttribute('aria-pressed',String(dark));};
+  item.onclick=()=>{const dark=document.documentElement.classList.toggle('dark-mode');localStorage.setItem('lovetools-theme',dark?'dark':'light');update();};
+  nav.insertBefore(item,nav.querySelector('.menu'));
+  update();
+}
+
+const showResult=(el,html)=>{el.innerHTML=html;el.classList.add('show');el.scrollIntoView({behavior:'smooth',block:'nearest'})};
 function hashScore(a,b,extra=''){let s=(a+'|'+b+'|'+extra).toLowerCase().split('').reduce((n,c,i)=>n+c.charCodeAt(0)*(i+3),17);return 45+(s%51)}
 function zodiac(m,d){const z=[['Capricorn',1,20],['Aquarius',2,19],['Pisces',3,21],['Aries',4,20],['Taurus',5,21],['Gemini',6,21],['Cancer',7,23],['Leo',8,23],['Virgo',9,23],['Libra',10,23],['Scorpio',11,22],['Sagittarius',12,22],['Capricorn',12,22]];for(let i=1;i<z.length;i++){if(m===z[i][1]&&d>=z[i][2])return z[i][0]}return z[0][0]}
 function dateOnly(value){const [y,m,d]=String(value).split('-').map(Number);return y&&m&&d?new Date(y,m-1,d):null}
@@ -10,6 +28,7 @@ function todayISO(){const d=new Date();return new Date(d.getTime()-d.getTimezone
 function validationResult(el,message){showResult(el,`<h2>Please check your details</h2><p>${esc(message)}</p>`)}
 
 document.addEventListener('DOMContentLoaded',()=>{
+ setupThemeToggle();
  const nav=$('.nav'),menu=$('.menu');if(menu)menu.onclick=()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open))};
  if(menu)menu.setAttribute('aria-expanded','false');
  if($('#loveCalc'))$('#loveCalc').onsubmit=e=>{e.preventDefault();let a=$('#name1').value.trim(),b=$('#name2').value.trim();if(!a||!b)return validationResult($('#loveResult'),'Please enter both names.');let n=hashScore(a,b);showResult($('#loveResult'),`<h2>Your Love Score</h2><div class="score">${n}%</div><p>A fun compatibility result for <b>${esc(a)}</b> and <b>${esc(b)}</b>.</p><div class="chips"><span class="chip">Romance ${Math.min(99,n+4)}%</span><span class="chip">Connection ${Math.max(1,n-3)}%</span></div><p class="notice">For entertainment only — a percentage cannot predict a real relationship.</p>`)};
@@ -25,29 +44,10 @@ document.addEventListener('DOMContentLoaded',()=>{
  if($('#msgGen'))$('#msgGen').onsubmit=e=>{e.preventDefault();let mood=$('#msgMood').value,name=$('#msgName').value.trim();const address=name?` ${esc(name)}`:'';let templates={Romantic:`My love${address}, every moment with you feels like a little piece of magic. I’m grateful for you today and every day. ❤️`,Cute:`${name?`Hey ${esc(name)}, `:''}just a little reminder that you make my days brighter and my heart happier. Thinking of you! 💕`,Flirty:`${name?`${esc(name)}, `:''}I was trying to focus today, but then you crossed my mind again. Clearly, you’re becoming my favorite distraction. 😉`,Sweet:`${name?`${esc(name)}, `:''}I hope you know how special you are to me. Thank you for being someone I can smile about every day. 💗`,Anniversary:`Happy anniversary${address}! I’m so grateful for every memory we’ve created and excited for all the moments still ahead. ❤️`};const text=templates[mood];showResult($('#msgResult'),`<h2>Your ${esc(mood)} Message</h2><p class="quote">${text}</p><button class="btn" type="button" id="copyMessage">Copy Message</button><p id="copyStatus" class="notice" hidden>Message copied! 💕</p>`);const copy=$('#copyMessage');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText($('#msgResult .quote').innerText);$('#copyStatus').hidden=false}catch{const ta=document.createElement('textarea');ta.value=$('#msgResult .quote').innerText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();$('#copyStatus').hidden=false}}};
 });
 
-/* Lightweight decorative heart rain: CSS handles animation, JS only creates a few nodes. */
 document.addEventListener('DOMContentLoaded',()=>{
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  const layer=document.createElement('div');
-  layer.className='heart-rain';
-  layer.setAttribute('aria-hidden','true');
-  document.body.appendChild(layer);
-  const mobile=window.matchMedia('(max-width:600px)').matches;
-  const count=mobile?5:8;
-  const spawn=()=>{
-    const heart=document.createElement('span');
-    heart.className='floating-heart';
-    heart.textContent=Math.random()>.28?'♥':'❤';
-    heart.style.left=`${Math.random()*100}%`;
-    heart.style.setProperty('--drift',`${(Math.random()*90-45).toFixed(0)}px`);
-    heart.style.setProperty('--spin',`${(Math.random()*80-40).toFixed(0)}deg`);
-    heart.style.animationDuration=`${(7+Math.random()*5).toFixed(1)}s`;
-    heart.style.animationDelay=`${(Math.random()*1.5).toFixed(2)}s`;
-    heart.style.fontSize=`${(12+Math.random()*7).toFixed(0)}px`;
-    layer.appendChild(heart);
-    heart.addEventListener('animationend',()=>heart.remove(),{once:true});
-  };
-  for(let i=0;i<count;i++)spawn();
-  const timer=setInterval(spawn,2600);
-  window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
+  const layer=document.createElement('div');layer.className='heart-rain';layer.setAttribute('aria-hidden','true');document.body.appendChild(layer);
+  const mobile=window.matchMedia('(max-width:600px)').matches,count=mobile?5:8;
+  const spawn=()=>{const heart=document.createElement('span');heart.className='floating-heart';heart.textContent=Math.random()>.28?'♥':'❤';heart.style.left=`${Math.random()*100}%`;heart.style.setProperty('--drift',`${(Math.random()*90-45).toFixed(0)}px`);heart.style.setProperty('--spin',`${(Math.random()*80-40).toFixed(0)}deg`);heart.style.animationDuration=`${(7+Math.random()*5).toFixed(1)}s`;heart.style.animationDelay=`${(Math.random()*1.5).toFixed(2)}s`;heart.style.fontSize=`${(12+Math.random()*7).toFixed(0)}px`;layer.appendChild(heart);heart.addEventListener('animationend',()=>heart.remove(),{once:true})};
+  for(let i=0;i<count;i++)spawn();const timer=setInterval(spawn,2600);window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
 });
