@@ -9,42 +9,9 @@ function formatDuration(total){let years=Math.floor(total/365.2425);let rem=Math
 function todayISO(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
 function validationResult(el,message){showResult(el,`<h2>Please check your details</h2><p>${esc(message)}</p>`)}
 
-/* Instant local language UI. English remains the crawlable/default HTML. No external translation script or network request is used. */
-const LANGS=[['en','English'],['es','Español'],['fr','Français'],['de','Deutsch'],['pt','Português'],['it','Italiano'],['nl','Nederlands'],['pl','Polski'],['tr','Türkçe'],['ru','Русский'],['uk','Українська'],['ar','العربية'],['fa','فارسی'],['hi','हिन्दी'],['bn','বাংলা'],['ur','اردو'],['ta','தமிழ்'],['si','සිංහල'],['id','Bahasa Indonesia'],['ms','Bahasa Melayu'],['vi','Tiếng Việt'],['th','ไทย'],['zh-CN','简体中文'],['zh-TW','繁體中文'],['ja','日本語'],['ko','한국어']];
-const UI={
-'en':{'Language':'Language','Check your details':'Please check your details','Please enter both names.':'Please enter both names.','Copy Message':'Copy Message','Message copied! 💕':'Message copied! 💕'},
-'es':{'Language':'Idioma','Check your details':'Revisa tus datos','Please enter both names.':'Introduce ambos nombres.','Copy Message':'Copiar mensaje','Message copied! 💕':'¡Mensaje copiado! 💕'},
-'fr':{'Language':'Langue','Check your details':'Vérifiez vos informations','Please enter both names.':'Saisissez les deux noms.','Copy Message':'Copier le message','Message copied! 💕':'Message copié ! 💕'},
-'de':{'Language':'Sprache','Check your details':'Bitte überprüfe deine Angaben','Please enter both names.':'Bitte beide Namen eingeben.','Copy Message':'Nachricht kopieren','Message copied! 💕':'Nachricht kopiert! 💕'},
-'pt':{'Language':'Idioma','Check your details':'Verifique os seus dados','Please enter both names.':'Digite os dois nomes.','Copy Message':'Copiar mensagem','Message copied! 💕':'Mensagem copiada! 💕'},
-'it':{'Language':'Lingua','Check your details':'Controlla i tuoi dati','Please enter both names.':'Inserisci entrambi i nomi.','Copy Message':'Copia messaggio','Message copied! 💕':'Messaggio copiato! 💕'},
-'nl':{'Language':'Taal','Check your details':'Controleer je gegevens','Please enter both names.':'Vul beide namen in.','Copy Message':'Bericht kopiëren','Message copied! 💕':'Bericht gekopieerd! 💕'},
-'pl':{'Language':'Język','Check your details':'Sprawdź dane','Please enter both names.':'Wpisz oba imiona.','Copy Message':'Kopiuj wiadomość','Message copied! 💕':'Wiadomość skopiowana! 💕'},
-'tr':{'Language':'Dil','Check your details':'Bilgilerinizi kontrol edin','Please enter both names.':'İki adı da girin.','Copy Message':'Mesajı kopyala','Message copied! 💕':'Mesaj kopyalandı! 💕'},
-'ru':{'Language':'Язык','Check your details':'Проверьте данные','Please enter both names.':'Введите оба имени.','Copy Message':'Скопировать сообщение','Message copied! 💕':'Сообщение скопировано! 💕'},
-'uk':{'Language':'Мова','Check your details':'Перевірте дані','Please enter both names.':'Введіть обидва імені.','Copy Message':'Копіювати повідомлення','Message copied! 💕':'Повідомлення скопійовано! 💕'},
-'ar':{'Language':'اللغة','Check your details':'تحقق من بياناتك','Please enter both names.':'أدخل الاسمين.','Copy Message':'نسخ الرسالة','Message copied! 💕':'تم نسخ الرسالة! 💕'},
-'fa':{'Language':'زبان','Check your details':'اطلاعات را بررسی کنید','Please enter both names.':'هر دو نام را وارد کنید.','Copy Message':'کپی پیام','Message copied! 💕':'پیام کپی شد! 💕'},
-'hi':{'Language':'भाषा','Check your details':'अपनी जानकारी जाँचें','Please enter both names.':'दोनों नाम दर्ज करें।','Copy Message':'संदेश कॉपी करें','Message copied! 💕':'संदेश कॉपी हो गया! 💕'},
-'bn':{'Language':'ভাষা','Check your details':'তথ্য যাচাই করুন','Please enter both names.':'দুটি নামই লিখুন।','Copy Message':'বার্তা কপি করুন','Message copied! 💕':'বার্তা কপি হয়েছে! 💕'},
-'ur':{'Language':'زبان','Check your details':'اپنی معلومات چیک کریں','Please enter both names.':'دونوں نام درج کریں۔','Copy Message':'پیغام کاپی کریں','Message copied! 💕':'پیغام کاپی ہو گیا! 💕'},
-'ta':{'Language':'மொழி','Check your details':'உங்கள் விவரங்களைச் சரிபார்க்கவும்','Please enter both names.':'இரண்டு பெயர்களையும் உள்ளிடவும்.','Copy Message':'செய்தியை நகலெடுக்கவும்','Message copied! 💕':'செய்தி நகலெடுக்கப்பட்டது! 💕'},
-'si':{'Language':'භාෂාව','Check your details':'ඔබේ විස්තර පරීක්ෂා කරන්න','Please enter both names.':'නම් දෙකම ඇතුළත් කරන්න.','Copy Message':'පණිවිඩය පිටපත් කරන්න','Message copied! 💕':'පණිවිඩය පිටපත් කළා! 💕'},
-'id':{'Language':'Bahasa','Check your details':'Periksa data Anda','Please enter both names.':'Masukkan kedua nama.','Copy Message':'Salin pesan','Message copied! 💕':'Pesan disalin! 💕'},
-'ms':{'Language':'Bahasa','Check your details':'Semak maklumat anda','Please enter both names.':'Masukkan kedua-dua nama.','Copy Message':'Salin mesej','Message copied! 💕':'Mesej disalin! 💕'},
-'vi':{'Language':'Ngôn ngữ','Check your details':'Kiểm tra thông tin','Please enter both names.':'Hãy nhập cả hai tên.','Copy Message':'Sao chép tin nhắn','Message copied! 💕':'Đã sao chép tin nhắn! 💕'},
-'th':{'Language':'ภาษา','Check your details':'ตรวจสอบข้อมูลของคุณ','Please enter both names.':'กรอกชื่อทั้งสองคน','Copy Message':'คัดลอกข้อความ','Message copied! 💕':'คัดลอกข้อความแล้ว! 💕'},
-'zh-CN':{'Language':'语言','Check your details':'请检查您的信息','Please enter both names.':'请输入两个姓名。','Copy Message':'复制消息','Message copied! 💕':'消息已复制！💕'},
-'zh-TW':{'Language':'語言','Check your details':'請檢查您的資料','Please enter both names.':'請輸入兩個姓名。','Copy Message':'複製訊息','Message copied! 💕':'訊息已複製！💕'},
-'ja':{'Language':'言語','Check your details':'入力内容を確認してください','Please enter both names.':'2人の名前を入力してください。','Copy Message':'メッセージをコピー','Message copied! 💕':'メッセージをコピーしました！💕'},
-'ko':{'Language':'언어','Check your details':'입력 내용을 확인하세요','Please enter both names.':'두 이름을 입력하세요.','Copy Message':'메시지 복사','Message copied! 💕':'메시지가 복사되었습니다! 💕'}
-};
-function localizeStatic(code){const dict=UI[code]||UI.en;document.documentElement.lang=code;const select=$('#languageSelect');if(select)select.setAttribute('aria-label',dict.Language||'Language');document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(dict[key])el.textContent=dict[key]});document.querySelectorAll('.btn').forEach(btn=>{if(btn.dataset.i18nKey&&dict[btn.dataset.i18nKey])btn.textContent=dict[btn.dataset.i18nKey]})}
-function addLanguageSelector(){const nav=$('.nav');if(!nav||nav.querySelector('.language-switcher'))return;const wrap=document.createElement('div');wrap.className='language-switcher';wrap.innerHTML='<span aria-hidden="true">🌐</span><label class="sr-only" for="languageSelect">Language</label><select id="languageSelect" aria-label="Language"></select>';const select=wrap.querySelector('select');LANGS.forEach(([code,name])=>{const o=document.createElement('option');o.value=code;o.textContent=name;select.appendChild(o)});select.value=localStorage.getItem('loveToolsLang')||'en';select.addEventListener('change',()=>{localStorage.setItem('loveToolsLang',select.value);localizeStatic(select.value)});nav.appendChild(wrap);localizeStatic(select.value)}
-
 document.addEventListener('DOMContentLoaded',()=>{
- addLanguageSelector();
- const nav=$('.nav'),menu=$('.menu');if(menu)menu.onclick=()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open))};if(menu)menu.setAttribute('aria-expanded','false');
+ const nav=$('.nav'),menu=$('.menu');if(menu)menu.onclick=()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open))};
+ if(menu)menu.setAttribute('aria-expanded','false');
  if($('#loveCalc'))$('#loveCalc').onsubmit=e=>{e.preventDefault();let a=$('#name1').value.trim(),b=$('#name2').value.trim();if(!a||!b)return validationResult($('#loveResult'),'Please enter both names.');let n=hashScore(a,b);showResult($('#loveResult'),`<h2>Your Love Score</h2><div class="score">${n}%</div><p>A fun compatibility result for <b>${esc(a)}</b> and <b>${esc(b)}</b>.</p><div class="chips"><span class="chip">Romance ${Math.min(99,n+4)}%</span><span class="chip">Connection ${Math.max(1,n-3)}%</span></div><p class="notice">For entertainment only — a percentage cannot predict a real relationship.</p>`)};
  if($('#compatCalc'))$('#compatCalc').onsubmit=e=>{e.preventDefault();let a=$('#c1').value.trim(),b=$('#c2').value.trim(),q=$('#c3').value;if(!a||!b)return validationResult($('#compatResult'),'Please enter both names.');let n=hashScore(a,b,q);showResult($('#compatResult'),`<h2>Overall Compatibility</h2><div class="score">${n}%</div><p>${esc(a)} &amp; ${esc(b)} show a ${n>=80?'strong':n>=65?'promising':'interesting'} fun match.</p><div class="chips"><span class="chip">Communication ${Math.max(55,n-4)}%</span><span class="chip">Trust ${Math.min(98,n+2)}%</span><span class="chip">Romance ${Math.min(99,n+6)}%</span></div><p class="notice">For entertainment only — compatibility cannot be reduced to a percentage.</p>`)};
  if($('#zodiacCalc'))$('#zodiacCalc').onsubmit=e=>{e.preventDefault();let a=$('#z1').value,b=$('#z2').value,n=hashScore(a,b);showResult($('#zodiacResult'),`<h2>${esc(a)} + ${esc(b)}</h2><div class="score">${n}%</div><p>Your zodiac pairing has a ${n>=80?'strong':n>=65?'balanced':'curious'} fun compatibility score.</p><div class="chips"><span class="chip">Romance ${Math.min(99,n+5)}%</span><span class="chip">Communication ${Math.max(55,n-2)}%</span></div><p class="notice">Astrology is for entertainment and is not a scientific predictor of relationship outcomes.</p>`)};
@@ -58,4 +25,29 @@ document.addEventListener('DOMContentLoaded',()=>{
  if($('#msgGen'))$('#msgGen').onsubmit=e=>{e.preventDefault();let mood=$('#msgMood').value,name=$('#msgName').value.trim();const address=name?` ${esc(name)}`:'';let templates={Romantic:`My love${address}, every moment with you feels like a little piece of magic. I’m grateful for you today and every day. ❤️`,Cute:`${name?`Hey ${esc(name)}, `:''}just a little reminder that you make my days brighter and my heart happier. Thinking of you! 💕`,Flirty:`${name?`${esc(name)}, `:''}I was trying to focus today, but then you crossed my mind again. Clearly, you’re becoming my favorite distraction. 😉`,Sweet:`${name?`${esc(name)}, `:''}I hope you know how special you are to me. Thank you for being someone I can smile about every day. 💗`,Anniversary:`Happy anniversary${address}! I’m so grateful for every memory we’ve created and excited for all the moments still ahead. ❤️`};const text=templates[mood];showResult($('#msgResult'),`<h2>Your ${esc(mood)} Message</h2><p class="quote">${text}</p><button class="btn" type="button" id="copyMessage">Copy Message</button><p id="copyStatus" class="notice" hidden>Message copied! 💕</p>`);const copy=$('#copyMessage');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText($('#msgResult .quote').innerText);$('#copyStatus').hidden=false}catch{const ta=document.createElement('textarea');ta.value=$('#msgResult .quote').innerText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();$('#copyStatus').hidden=false}}};
 });
 
-document.addEventListener('DOMContentLoaded',()=>{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;const layer=document.createElement('div');layer.className='heart-rain';layer.setAttribute('aria-hidden','true');document.body.appendChild(layer);const mobile=window.matchMedia('(max-width:600px)').matches,count=mobile?5:8;const spawn=()=>{const heart=document.createElement('span');heart.className='floating-heart';heart.textContent=Math.random()>.28?'♥':'❤';heart.style.left=`${Math.random()*100}%`;heart.style.setProperty('--drift',`${(Math.random()*90-45).toFixed(0)}px`);heart.style.setProperty('--spin',`${(Math.random()*80-40).toFixed(0)}deg`);heart.style.animationDuration=`${(7+Math.random()*5).toFixed(1)}s`;heart.style.animationDelay=`${(Math.random()*1.5).toFixed(2)}s`;heart.style.fontSize=`${(12+Math.random()*7).toFixed(0)}px`;layer.appendChild(heart);heart.addEventListener('animationend',()=>heart.remove(),{once:true})};for(let i=0;i<count;i++)spawn();const timer=setInterval(spawn,2600);window.addEventListener('pagehide',()=>clearInterval(timer),{once:true})});
+/* Lightweight decorative heart rain: CSS handles animation, JS only creates a few nodes. */
+document.addEventListener('DOMContentLoaded',()=>{
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const layer=document.createElement('div');
+  layer.className='heart-rain';
+  layer.setAttribute('aria-hidden','true');
+  document.body.appendChild(layer);
+  const mobile=window.matchMedia('(max-width:600px)').matches;
+  const count=mobile?5:8;
+  const spawn=()=>{
+    const heart=document.createElement('span');
+    heart.className='floating-heart';
+    heart.textContent=Math.random()>.28?'♥':'❤';
+    heart.style.left=`${Math.random()*100}%`;
+    heart.style.setProperty('--drift',`${(Math.random()*90-45).toFixed(0)}px`);
+    heart.style.setProperty('--spin',`${(Math.random()*80-40).toFixed(0)}deg`);
+    heart.style.animationDuration=`${(7+Math.random()*5).toFixed(1)}s`;
+    heart.style.animationDelay=`${(Math.random()*1.5).toFixed(2)}s`;
+    heart.style.fontSize=`${(12+Math.random()*7).toFixed(0)}px`;
+    layer.appendChild(heart);
+    heart.addEventListener('animationend',()=>heart.remove(),{once:true});
+  };
+  for(let i=0;i<count;i++)spawn();
+  const timer=setInterval(spawn,2600);
+  window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
+});
