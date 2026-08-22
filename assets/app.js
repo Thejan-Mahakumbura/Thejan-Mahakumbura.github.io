@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]));
 
 /* Site-wide favicon: applied consistently to every page that loads this shared script. */
 (function(){
@@ -9,11 +9,39 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
   document.head.appendChild(link);
 })();
 
+/* Site-wide PWA metadata/registration: safe fallback for pages that do not hard-code the manifest. */
+(function(){
+  if(!document.querySelector('link[rel="manifest"]')){
+    const link=document.createElement('link'); link.rel='manifest'; link.href='/manifest.webmanifest'; document.head.appendChild(link);
+  }
+  if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+})();
+
 /* Site-wide theme preference: saved locally and restored on every page. */
 (function(){
   const saved=localStorage.getItem('lovetools-theme');
   if(saved==='dark')document.documentElement.classList.add('dark-mode');
 })();
+
+/* Friendly install UI. It appears only when the browser exposes a native install prompt. */
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredInstallPrompt=e;
+  const existing=document.querySelector('.pwa-install'); if(existing)existing.remove();
+  const button=document.createElement('button');
+  button.type='button'; button.className='pwa-install'; button.innerHTML='📱 <span>Install LoveTools</span>';
+  button.setAttribute('aria-label','Install LoveTools app');
+  button.addEventListener('click',async()=>{
+    if(!deferredInstallPrompt)return;
+    deferredInstallPrompt.prompt();
+    const choice=await deferredInstallPrompt.userChoice;
+    if(choice.outcome==='accepted')button.remove();
+    deferredInstallPrompt=null;
+  });
+  const nav=document.querySelector('.nav');
+  if(nav)nav.appendChild(button); else document.body.appendChild(button);
+});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;document.querySelectorAll('.pwa-install').forEach(el=>el.remove())});
 
 function setupThemeToggle(){
   const nav=$('.nav'),links=$('.navlinks');
