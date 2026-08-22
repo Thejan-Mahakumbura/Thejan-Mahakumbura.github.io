@@ -1,6 +1,14 @@
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
+/* Site-wide favicon: applied consistently to every page that loads this shared script. */
+(function(){
+  if(document.querySelector('link[rel~="icon"]'))return;
+  const link=document.createElement('link');
+  link.rel='icon'; link.type='image/svg+xml'; link.href='/assets/favicon.svg';
+  document.head.appendChild(link);
+})();
+
 /* Site-wide theme preference: saved locally and restored on every page. */
 (function(){
   const saved=localStorage.getItem('lovetools-theme');
