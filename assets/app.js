@@ -14,6 +14,9 @@ const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'
   if(!document.querySelector('link[rel="manifest"]')){
     const link=document.createElement('link'); link.rel='manifest'; link.href='/manifest.webmanifest'; document.head.appendChild(link);
   }
+  if(!document.querySelector('meta[name="theme-color"]')){
+    const meta=document.createElement('meta'); meta.name='theme-color'; meta.content='#fff7fb'; document.head.appendChild(meta);
+  }
   if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
 })();
 
@@ -22,6 +25,13 @@ const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'
   const saved=localStorage.getItem('lovetools-theme');
   if(saved==='dark')document.documentElement.classList.add('dark-mode');
 })();
+
+/* Keep the browser UI theme color aligned with the selected site theme. */
+function syncThemeColor(){
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta)meta.content=document.documentElement.classList.contains('dark-mode')?'#17131b':'#fff7fb';
+}
+syncThemeColor();
 
 /* Friendly install UI. It appears only when the browser exposes a native install prompt. */
 let deferredInstallPrompt=null;
@@ -48,7 +58,7 @@ function setupThemeToggle(){
   if(!nav||!links||$('.theme-toggle'))return;
   const item=document.createElement('button');
   item.type='button'; item.className='theme-toggle'; item.setAttribute('aria-label','Switch to dark mode'); item.setAttribute('aria-pressed',String(document.documentElement.classList.contains('dark-mode')));
-  const update=()=>{const dark=document.documentElement.classList.contains('dark-mode');item.innerHTML=dark?'☀️ <span>Light</span>':'🌙 <span>Dark</span>';item.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');item.setAttribute('aria-pressed',String(dark));};
+  const update=()=>{const dark=document.documentElement.classList.contains('dark-mode');item.innerHTML=dark?'☀️ <span>Light</span>':'🌙 <span>Dark</span>';item.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');item.setAttribute('aria-pressed',String(dark));syncThemeColor();};
   item.onclick=()=>{const dark=document.documentElement.classList.toggle('dark-mode');localStorage.setItem('lovetools-theme',dark?'dark':'light');update();};
   nav.insertBefore(item,nav.querySelector('.menu'));
   update();
