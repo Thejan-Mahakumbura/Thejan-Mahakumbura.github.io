@@ -20,6 +20,16 @@ const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'
   if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
 })();
 
+/* Site-wide Monetag In-Page Push: loaded once on every page through the shared script. */
+(function(){
+  if(document.querySelector('script[data-lovetools-monetag="11686547"]'))return;
+  const s=document.createElement('script');
+  s.dataset.lovetoolsMonetag='11686547';
+  s.dataset.zone='11686547';
+  s.src='https://nap5k.com/tag.min.js';
+  document.head.appendChild(s);
+})();
+
 /* Site-wide theme preference: saved locally and restored on every page. */
 (function(){
   const saved=localStorage.getItem('lovetools-theme');
