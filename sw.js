@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lovetools-v1';
+const CACHE_NAME = 'lovetools-v2';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/assets/style.css', '/assets/app.js', '/assets/favicon.svg'];
 
 self.addEventListener('install', event => {
